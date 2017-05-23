@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TRUE  1
+#define FALSE 0
+#define TABLE_DOUBLING_THRESHOLD .667
+#define DOUBLING_FACTOR 2
+
 typedef struct _oa_hash_table_entry {
   int key;
   int value;
-  int isDeleted;
+  int is_deleted;
 } oa_hash_table_entry;
 
 typedef struct _oa_hash_table {
