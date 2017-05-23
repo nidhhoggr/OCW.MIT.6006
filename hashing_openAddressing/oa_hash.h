@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef DEBUG
+# define DEBUG_PRINT(x) printf x
+#else
+# define DEBUG_PRINT(x) do {} while (0)
+#endif
+
 #define TRUE  1
 #define FALSE 0
 #define TABLE_DOUBLING_THRESHOLD .667

@@ -2,13 +2,13 @@
 
 int oa_hash(oa_hash_table *table, int key, int trial_count) {
   int hashed_key = (key + trial_count) % table->size;
-  printf("oa_hash(): hashed %d to %d\n", key, hashed_key);
+  DEBUG_PRINT(("oa_hash(): hashed %d to %d\n", key, hashed_key));
   return hashed_key;
 }
 
 oa_hash_table * oa_table_doubling(oa_hash_table *old_table) {
 
-  printf("oa_table_doubling(): of size: %d\n", old_table->size * DOUBLING_FACTOR);
+  DEBUG_PRINT(("oa_table_doubling(): of size: %d\n", old_table->size * DOUBLING_FACTOR));
 
   oa_hash_table * new_table = oa_create(old_table->size * DOUBLING_FACTOR);
 
@@ -29,10 +29,10 @@ oa_hash_table * oa_table_doubling(oa_hash_table *old_table) {
 
 oa_hash_table * oa_insert(oa_hash_table *table, int key, int value) {
 
-  printf("oa_insert(): %d => %d\n", key, value);
+  DEBUG_PRINT(("oa_insert(): %d => %d\n", key, value));
    
   if(table->available_slots < (int)(table->size * TABLE_DOUBLING_THRESHOLD)) {
-    printf("\toa_insert(): launching table doubling %d %d\n", table->available_slots, (int)(table->size * .6));
+    DEBUG_PRINT(("\toa_insert(): launching table doubling %d %d\n", table->available_slots, (int)(table->size * .6)));
     table = oa_table_doubling(table);
   }
 
@@ -73,7 +73,7 @@ int oa_delete(oa_hash_table *table, int key) {
   int i;
 
   while(table->entries[hashed_key] != NULL && key != table->entries[hashed_key]->key) {
-      printf("\toa_delete(): key collision:  hashed_key: %d, entry->key: %d\n", hashed_key, table->entries[hashed_key]->key);
+      DEBUG_PRINT(("\toa_delete(): key collision:  hashed_key: %d, entry->key: %d\n", hashed_key, table->entries[hashed_key]->key));
       hashed_key = oa_hash(table, key, ++trial_count);
   }
 
@@ -89,7 +89,7 @@ int oa_delete(oa_hash_table *table, int key) {
 
 oa_hash_table_entry * oa_search(oa_hash_table *table, int key) {
   
-  printf("oa_search(): for key %d\n", key); 
+  DEBUG_PRINT(("oa_search(): for key %d\n", key)); 
   
   int trial_count = 0;
 
@@ -98,7 +98,7 @@ oa_hash_table_entry * oa_search(oa_hash_table *table, int key) {
   int i;
 
   while(table->entries[hashed_key] != NULL && key != table->entries[hashed_key]->key) {
-      printf("\toa_search(): key collision hashed_key: %d, entry->key: %d\n", hashed_key, table->entries[hashed_key]->key);
+      DEBUG_PRINT(("\toa_search(): key collision hashed_key: %d, entry->key: %d\n", hashed_key, table->entries[hashed_key]->key));
       hashed_key = oa_hash(table, key, ++trial_count);
   }
 
