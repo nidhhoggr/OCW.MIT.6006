@@ -49,10 +49,10 @@ int main( int argc, char **argv ) {
    if(my_entry == NULL) {
      DEBUG_PRINT((" - testing(): key 51 is empty as expected\n"));
    }
-   my_table = oa_insert(my_table, 51, 504);
+   my_table = oa_insert(my_table, 51, 502);
    my_entry = oa_search(my_table, 51);
    if(my_entry) {
-    DEBUG_PRINT((" - testing(): My Entry: %d = %d expecting 51 = 504\n", my_entry->key, my_entry->value));
+    DEBUG_PRINT((" - testing(): My Entry: %d = %d expecting 51 = 502\n", my_entry->key, my_entry->value));
    }
  }
 

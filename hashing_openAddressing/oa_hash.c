@@ -12,13 +12,11 @@ oa_hash_table * oa_table_doubling(oa_hash_table *old_table) {
 
   oa_hash_table * new_table = oa_create(old_table->size * DOUBLING_FACTOR);
 
-  int i, val, key;
+  int i;
 
   for(i = 0; i < old_table->size; i++) {
     if(old_table->entries[i] != NULL) {
-      key = old_table->entries[i]->key;
-      val = old_table->entries[i]->value;
-      oa_insert(new_table, key, val);
+      oa_insert(new_table, old_table->entries[i]->key, old_table->entries[i]->value);
     }
   }
   
@@ -32,7 +30,7 @@ oa_hash_table * oa_insert(oa_hash_table *table, int key, int value) {
   DEBUG_PRINT(("oa_insert(): %d => %d\n", key, value));
    
   if(table->available_slots < (int)(table->size * TABLE_DOUBLING_THRESHOLD)) {
-    DEBUG_PRINT(("\toa_insert(): launching table doubling %d %d\n", table->available_slots, (int)(table->size * .6)));
+    DEBUG_PRINT(("\toa_insert(): launching table doubling %d %d\n", table->available_slots, (int)(table->size * TABLE_DOUBLING_THRESHOLD)));
     table = oa_table_doubling(table);
   }
 
@@ -53,13 +51,11 @@ oa_hash_table * oa_insert(oa_hash_table *table, int key, int value) {
     hashed_key = oa_hash(table, key, ++trial_count);
   }
   
-  if(table->entries[hashed_key] == NULL) {
-    table->entries[hashed_key] = (oa_hash_table_entry*) malloc( sizeof(oa_hash_table_entry));
-    table->entries[hashed_key]->value = value;
-    table->entries[hashed_key]->key = key;
-    table->entries[hashed_key]->is_deleted = FALSE;
-    table->available_slots--;
-  }
+  table->entries[hashed_key] = (oa_hash_table_entry*) malloc( sizeof(oa_hash_table_entry));
+  table->entries[hashed_key]->value = value;
+  table->entries[hashed_key]->key = key;
+  table->entries[hashed_key]->is_deleted = FALSE;
+  table->available_slots--;
 
   return table;
 }
