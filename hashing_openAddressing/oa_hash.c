@@ -45,6 +45,7 @@ oa_hash_table * oa_insert(oa_hash_table *table, int key, int value) {
       break;
     }
     else if(table->entries[hashed_key]->is_deleted == TRUE) {
+      free(table->entries[hashed_key]);
       table->entries[hashed_key] = NULL;
       break;
     }

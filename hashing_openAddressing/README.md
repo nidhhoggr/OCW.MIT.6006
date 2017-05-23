@@ -8,6 +8,11 @@ This is a form of hashing that solves the problem of key collisions without havi
 collided values in a linked list. Instead probing is used to pick another available slot. The probing
 mechanism is used in insertion, deletion and search operations.
 
+## Probing Techniques
+1. linear
+1. double hash
+1. uniform theory
+
 ## Table Doubling
 
 Table doubling is an approach to dynamically resize the capcity of the table. It is a liner operation because it has to copy all of the element from an existing table to a new table of `n` size bigger where `n` is the `TABLE_DOUBLING_FACTOR`
