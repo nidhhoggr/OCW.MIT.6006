@@ -1,7 +1,33 @@
 #include "oa_hash.h"
+#include <stdint.h>
+
+/**
+ * The two hash functions below were taken from:
+ * http://burtleburtle.net/bob/hash/integer.html
+ */
+
+uint32_t hash_one( int a) {
+  a += ~(a<<15);
+  a ^=  (a>>10);
+  a +=  (a<<3);
+  a ^=  (a>>6);
+  a += ~(a<<11);
+  a ^=  (a>>16);
+  return a;
+}
+
+uint32_t hash_two( int a) {
+  a = (a+0x7ed55d16) + (a<<12);
+  a = (a^0xc761c23c) ^ (a>>19);
+  a = (a+0x165667b1) + (a<<5);
+  a = (a+0xd3a2646c) ^ (a<<9);
+  a = (a+0xfd7046c5) + (a<<3);
+  a = (a^0xb55a4f09) ^ (a>>16);
+  return a;
+}
 
 int oa_hash(oa_hash_table *table, int key, int trial_count) {
-  int hashed_key = (key + trial_count) % table->size;
+  int hashed_key = abs(hash_one(key) + (hash_two(key) * trial_count) - trial_count) % table->size;
   DEBUG_PRINT(("oa_hash(): hashed %d to %d\n", key, hashed_key));
   return hashed_key;
 }
@@ -52,7 +78,7 @@ oa_hash_table * oa_insert(oa_hash_table *table, int key, int value) {
     hashed_key = oa_hash(table, key, ++trial_count);
   }
   
-  table->entries[hashed_key] = (oa_hash_table_entry*) malloc( sizeof(oa_hash_table_entry));
+  table->entries[hashed_key] = malloc( sizeof(oa_hash_table_entry));
   table->entries[hashed_key]->value = value;
   table->entries[hashed_key]->key = key;
   table->entries[hashed_key]->is_deleted = FALSE;
@@ -78,6 +104,7 @@ int oa_delete(oa_hash_table *table, int key) {
     table->entries[hashed_key]->key = 0;
     table->entries[hashed_key]->value = 0;
     table->entries[hashed_key]->is_deleted = TRUE;
+    table->available_slots++;
     return TRUE;
   }
 
@@ -116,9 +143,9 @@ void oa_destroy(oa_hash_table *table) {
 
 oa_hash_table * oa_create(int size) {
 
-  oa_hash_table *new_table = (oa_hash_table*) malloc(sizeof(oa_hash_table));
+  oa_hash_table *new_table = malloc(sizeof(oa_hash_table));
  
-  new_table->entries = (oa_hash_table_entry**) malloc(sizeof(oa_hash_table_entry*) * size);
+  new_table->entries = malloc(sizeof(oa_hash_table_entry*) * size);
 
   new_table->size = size;
 
