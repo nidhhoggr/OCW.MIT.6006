@@ -1,5 +1,6 @@
-#include "oa_hash.h"
 #include <stdint.h>
+#include <assert.h>
+#include "oa_hash.h"
 
 /**
  * The two hash functions below were taken from:
@@ -79,6 +80,8 @@ oa_hash_table * oa_insert(oa_hash_table *table, int key, int value) {
   }
   
   table->entries[hashed_key] = malloc( sizeof(oa_hash_table_entry));
+  assert(table->entries[hashed_key]);
+
   table->entries[hashed_key]->value = value;
   table->entries[hashed_key]->key = key;
   table->entries[hashed_key]->is_deleted = FALSE;
@@ -144,8 +147,10 @@ void oa_destroy(oa_hash_table *table) {
 oa_hash_table * oa_create(int size) {
 
   oa_hash_table *new_table = malloc(sizeof(oa_hash_table));
+  assert(new_table);
  
   new_table->entries = malloc(sizeof(oa_hash_table_entry*) * size);
+  assert(new_table->entries);
 
   new_table->size = size;
 
