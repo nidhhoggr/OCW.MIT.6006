@@ -10,11 +10,11 @@ mechanism is used in insertion, deletion and search operations.
 
 ## Probing Techniques
 1. linear
-  linear probing is iteratively probing the adjacent slot by `k = h(k) + r % s` where h is hash function, r is the retry count and s is the table size. This creates issues with the time complexity because the next availble adjacent slot will most likley always be occupied that is the next slot was instead randomly chosen. This increases the time complexity of all the operations to a linear constant factor where the the constant is the size of the clusters. To avoid the the next method of probing are more preferred. 
-
+>  linear probing is iteratively probing the adjacent slot by `k = h(k) + r % s` where h is hash function, r is the retry count and s is the table size. This creates issues with the time complexity because the next availble adjacent slot will most likley always be occupied that is the next slot was instead randomly chosen. This increases the time complexity of all the operations to a linear constant factor where the the constant is the size of the clusters. To avoid the the next method of probing are more preferred. 
+1. quadratic
+> `k = h(k) + r^2 % s`
 1. double hashing
-  double hashing is used to be morerandomly find the next slot which will reduce the amount of clusters in the table. This typically requires to seperate hashing algorithms taking the following form: `k = (h(k) + h2(k) + r ) % s`.
-
+  double hashing is used to be morerandomly find the next slot which will reduce the amount of clusters in the table. This typically requires to seperate hashing algorithms taking the following form: `k = (h(k) + h2(k)*r ) % s`.
 1. uniform theory
   
 ## Table Doubling
