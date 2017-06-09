@@ -96,6 +96,52 @@ void al_graph_dfs(al_graph *graph, int start) {
   al_graph_do_dfs(graph, start, visited);
 }
 
+al_queue* al_queue_create(int queueSize) {
+  al_queue *new_queue = malloc(sizeof(al_queue));
+  new_queue->queue = malloc(queueSize * sizeof(int));
+  new_queue->itemCount = 0;
+  return new_queue;
+}
+
+void al_queue_insert(al_queue *aq, int data) {
+   aq->queue[++aq->rear] = data;
+   aq->itemCount++;
+}
+
+int al_queue_pop(al_queue *aq) {
+   aq->itemCount--;
+   return aq->queue[aq->front++]; 
+}
+
+void al_graph_bfs(al_graph *graph, int start) {
+ 
+  int i;
+  for (i = 0; i < graph->vertex_count; ++i) {
+    if(graph->lists[i]->head) {
+      graph->lists[i]->head->is_visited = FALSE; 
+    }
+  }
+
+  al_node *pCrawl = graph->lists[start]->head;
+  al_queue *bfs_queue = al_queue_create(graph->vertex_count);
+  al_queue_insert(bfs_queue, pCrawl->dest);
+  
+  int vertexSrc;
+  while (bfs_queue->itemCount > 0) {
+    vertexSrc = al_queue_pop(bfs_queue);
+    pCrawl = graph->lists[vertexSrc]->head;
+    while(pCrawl) {
+      if(pCrawl->is_visited == FALSE) {
+        pCrawl->is_visited = TRUE;
+        al_queue_insert(bfs_queue, pCrawl->dest);
+        DEBUG_PRINT(("BFS node: %d\n", pCrawl->dest));
+      }
+      pCrawl = pCrawl->next;
+    }
+  }
+  //free(bfs_queue->queue);
+  free(bfs_queue);
+}
 
 void al_graph_print(al_graph *graph) {
   int i;
