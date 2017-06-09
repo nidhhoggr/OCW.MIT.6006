@@ -1,7 +1,7 @@
 #include "adj_list.c"
 
 int main() {
-    al_graph *graph = al_graph_create(5, TRUE);
+    al_graph *graph = al_graph_create(5, true);
     al_graph_insert_edge(graph, 0, 1);
     al_graph_insert_edge(graph, 0, 4);
     al_graph_insert_edge(graph, 1, 2);
@@ -12,7 +12,7 @@ int main() {
     al_graph_print(graph);
     al_graph_free(graph);
 
-    al_graph *graph2 = al_graph_create(5, FALSE);
+    al_graph *graph2 = al_graph_create(5, false);
     al_graph_insert_edge(graph2, 0, 1);
     al_graph_insert_edge(graph2, 0, 4);
     al_graph_insert_edge(graph2, 1, 2);

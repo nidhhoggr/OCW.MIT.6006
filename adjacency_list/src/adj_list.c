@@ -1,9 +1,12 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "al_debug.h"
 #include "adj_list.h"
+#include "al_queue.c"
 
-al_graph* al_graph_create(int num_of_vertices, int is_directed)
+int createCalled = 0;
+
+al_graph* al_graph_create(int num_of_vertices, bool is_directed)
 {
     al_graph *graph = malloc(sizeof(al_graph));
     assert(graph);
@@ -46,7 +49,7 @@ void al_graph_free(al_graph *graph) {
   free(graph);
 }
 
-al_node* al_node_create(int dest) {
+al_node* al_node_create(al_graph *graph, int dest) {
   al_node *newNode = malloc(sizeof(al_node));
   assert(newNode);
   newNode->dest = dest;
@@ -56,28 +59,29 @@ al_node* al_node_create(int dest) {
 
 void al_graph_insert_edge(al_graph *graph, int src, int dest) {
 
-  al_node *newNode = al_node_create(dest);
+  al_node *newNode = al_node_create(graph, dest);
   newNode->next = graph->lists[src]->head;
   graph->lists[src]->head = newNode;
   graph->lists[src]->edge_count++;
 
   //undirected graph edges are bidirectional
   if(!graph->is_directed) {
-    newNode = al_node_create(src);
+    newNode = al_node_create(graph, src);
     newNode->next = graph->lists[dest]->head;
     graph->lists[dest]->head = newNode;
     graph->lists[dest]->edge_count++;
   }
 }
 
-void al_graph_do_dfs(al_graph *graph, int src, int visited[]) { 
+void al_graph_do_dfs(al_graph *graph, int src, bool visited[], al_queue *traversalQueue) { 
   al_node *pCrawl = graph->lists[src]->head;
   while (pCrawl) {
     DEBUG_PRINT((" ITER: %d-%d\n", src, pCrawl->dest));
     if(!visited[pCrawl->dest]) {
       DEBUG_PRINT(("-> %d\n", pCrawl->dest));
-      visited[pCrawl->dest] = 1;
-      al_graph_do_dfs(graph, pCrawl->dest, visited);     
+      al_queue_insert(traversalQueue, pCrawl->dest);
+      visited[pCrawl->dest] = true;
+      al_graph_do_dfs(graph, pCrawl->dest, visited, traversalQueue); 
     }
     else {
       DEBUG_PRINT(("Was already visited %d  - %d\n", pCrawl->dest, visited[pCrawl->dest]));
@@ -86,61 +90,53 @@ void al_graph_do_dfs(al_graph *graph, int src, int visited[]) {
   }
 }
 
-
-void al_graph_dfs(al_graph *graph, int start) {
+al_queue* al_graph_dfs(al_graph *graph, int start) {
   int i;
-  int visited[graph->vertex_count];
+  bool visited[graph->vertex_count];
   for (i = 0; i < graph->vertex_count; i++) {
-    visited[i] = 0;
+    visited[i] = false;
   }
-  al_graph_do_dfs(graph, start, visited);
+  al_queue *traversalQueue = al_queue_create(graph->vertex_count);
+  al_graph_do_dfs(graph, start, visited, traversalQueue);
+  return traversalQueue;
 }
 
-al_queue* al_queue_create(int queueSize) {
-  al_queue *new_queue = malloc(sizeof(al_queue));
-  new_queue->queue = malloc(queueSize * sizeof(int));
-  new_queue->itemCount = 0;
-  return new_queue;
-}
+al_queue* al_graph_bfs(al_graph *graph, int start) {
 
-void al_queue_insert(al_queue *aq, int data) {
-   aq->queue[++aq->rear] = data;
-   aq->itemCount++;
-}
-
-int al_queue_pop(al_queue *aq) {
-   aq->itemCount--;
-   return aq->queue[aq->front++]; 
-}
-
-void al_graph_bfs(al_graph *graph, int start) {
- 
   int i;
-  for (i = 0; i < graph->vertex_count; ++i) {
-    if(graph->lists[i]->head) {
-      graph->lists[i]->head->is_visited = FALSE; 
-    }
+  bool visited[graph->vertex_count];
+  for (i = 0; i < graph->vertex_count; i++) {
+    visited[i] = false;
   }
 
   al_node *pCrawl = graph->lists[start]->head;
+  al_queue *traversalQueue = al_queue_create(graph->vertex_count);
   al_queue *bfs_queue = al_queue_create(graph->vertex_count);
-  al_queue_insert(bfs_queue, pCrawl->dest);
-  
+  al_queue_insert(bfs_queue, start);
+  al_queue_insert(traversalQueue, start);
+  DEBUG_PRINT(("BFS node: %d\n", start));
+
   int vertexSrc;
-  while (bfs_queue->itemCount > 0) {
+  while (!al_queue_is_empty(bfs_queue)) {
     vertexSrc = al_queue_pop(bfs_queue);
+    DEBUG_PRINT(("BFS queue pop: %d\n", vertexSrc));
     pCrawl = graph->lists[vertexSrc]->head;
     while(pCrawl) {
-      if(pCrawl->is_visited == FALSE) {
-        pCrawl->is_visited = TRUE;
+      if(visited[pCrawl->dest] == false) {
+        visited[pCrawl->dest] = true;
         al_queue_insert(bfs_queue, pCrawl->dest);
         DEBUG_PRINT(("BFS node: %d\n", pCrawl->dest));
+        al_queue_insert(traversalQueue, pCrawl->dest);
+      }
+      else {
+        DEBUG_PRINT(("%d has been visited\n", pCrawl->dest));
       }
       pCrawl = pCrawl->next;
     }
   }
-  //free(bfs_queue->queue);
-  free(bfs_queue);
+  al_queue_free(bfs_queue);
+
+  return traversalQueue;
 }
 
 void al_graph_print(al_graph *graph) {

@@ -1,7 +1,7 @@
 #include "adj_list.c"
 
 int main() {
-    al_graph *graph = al_graph_create(18, TRUE);
+    al_graph *graph = al_graph_create(18, true);
     al_graph_insert_edge(graph, 0, 2);
     al_graph_insert_edge(graph, 0, 14);
     al_graph_insert_edge(graph, 1, 4);
@@ -36,7 +36,28 @@ int main() {
     al_graph_insert_edge(graph, 16, 12);
     al_graph_insert_edge(graph, 17, 13);
     al_graph_insert_edge(graph, 17, 16);
-    al_graph_bfs(graph, 0);
+    DEBUG_PRINT(("Starting from vertex 0\n"));
+    al_queue *tq = al_graph_dfs(graph, 0);
+    int popped;
+    int expected[18] = {14, 7, 2, 6, 3, 17, 16, 12, 9, 10, 5, 8, 4, 1 , 13};
+    int i = 0;
+    while(!al_queue_is_empty(tq)) {
+      popped = al_queue_pop(tq); 
+      assert(popped == expected[i++]);  
+    }
+    al_queue_free(tq);
+
+    DEBUG_PRINT(("\n\nStarting from vertex 9\n"));
+    tq = al_graph_dfs(graph, 9);
+    int expectedNext[18] = {10, 17, 16, 12, 9, 5, 8, 7, 4, 1, 2, 6, 3, 13};
+    i = 0;
+    while(!al_queue_is_empty(tq)) {
+      popped = al_queue_pop(tq); 
+      assert(popped == expectedNext[i++]);  
+    }
+    al_queue_free(tq);
+
     al_graph_free(graph);
+
     return 0;
 }
