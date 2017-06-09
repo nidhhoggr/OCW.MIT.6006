@@ -69,7 +69,34 @@ void al_graph_insert_edge(al_graph *graph, int src, int dest) {
     graph->lists[dest]->edge_count++;
   }
 }
- 
+
+void al_graph_do_dfs(al_graph *graph, int src, int visited[]) { 
+  al_node *pCrawl = graph->lists[src]->head;
+  while (pCrawl) {
+    DEBUG_PRINT((" ITER: %d-%d\n", src, pCrawl->dest));
+    if(!visited[pCrawl->dest]) {
+      DEBUG_PRINT(("-> %d\n", pCrawl->dest));
+      visited[pCrawl->dest] = 1;
+      al_graph_do_dfs(graph, pCrawl->dest, visited);     
+    }
+    else {
+      DEBUG_PRINT(("Was already visited %d  - %d\n", pCrawl->dest, visited[pCrawl->dest]));
+    }
+    pCrawl = pCrawl->next;
+  }
+}
+
+
+void al_graph_dfs(al_graph *graph, int start) {
+  int i;
+  int visited[graph->vertex_count];
+  for (i = 0; i < graph->vertex_count; i++) {
+    visited[i] = 0;
+  }
+  al_graph_do_dfs(graph, start, visited);
+}
+
+
 void al_graph_print(al_graph *graph) {
   int i;
   for (i = 0; i < graph->vertex_count; ++i) {

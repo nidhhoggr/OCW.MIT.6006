@@ -9,6 +9,7 @@
 
 typedef struct _al_node {
   int dest;
+  int is_visited;
   struct _al_node *next;
 } al_node;
 
